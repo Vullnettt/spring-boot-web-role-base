@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Student Information</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+
+    <a class="navbar-brand" href="#">Student Information</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <h1>Student List</h1>
+
+    <div sec:authorize="isAuthenticated()">
+        Welcome <b><span sec:authentication="name">Username</span></b> &nbsp;
+        <i><span sec:authentication="principal.authorities">Roles</span></i>
+    </div>
+
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Logout" />
+    </form>&nbsp;
+
+    <div sec:authorize="hasAnyAuthority('CREATOR', 'ADMIN')">
+        <a href="/new" class="btn btn-primary btn-sm mb">Add Student</a>
+    </div>
+    <small>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Gender</th>
+            <th>Country</th>
+
+            <th sec:authorize="hasAnyAuthority('ADMIN', 'EDITOR')">Action</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="student : ${studentList}">
+            <td th:text="${student.studentId}"></td>
+            <td th:text="${student.firstName}"></td>
+            <td th:text="${student.email}" class="small"></td>
+            <td th:text="${student.password}" class="small"></td>
+            <td th:text="${student.gender}"></td>
+            <td th:text="${student.country}"></td>
+
+            <td sec:authorize="hasAnyAuthority('ADMIN', 'EDITOR')" class="row">
+                <div sec:authorize="hasAnyAuthority('ADMIN', 'EDITOR')">
+                    <a th:href="@{'/edit/' + ${student.studentId}}" class="btn btn-primary btn-sm mb">Update</a>
+                    </div>&nbsp;
+                <div sec:authorize="hasAnyAuthority('ADMIN')">
+                    <a th:href="@{'/delete/' + ${student.studentId}}" class="btn btn-danger btn-sm mb">Delete</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </small>
+</div>
+</body>
+</html>
